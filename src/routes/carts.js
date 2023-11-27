@@ -22,11 +22,9 @@ router.post('/', async (req, res) => {
 
 router.post('/:cid/products/:pid', async (req, res) => {
   try {
-    const { cid, pid } = req.params
-    
+    const { cid, pid } = req.params   
     const cart = await cartManager.saveProdToCart(cid, pid)
-    console.log(cart)
-
+    
     if (cart === 'Cart not found') {
       res.status(404).json({ message: 'Cart not found' })
     } else if (cart === 'Product not found') {

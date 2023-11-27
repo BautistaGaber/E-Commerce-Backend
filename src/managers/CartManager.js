@@ -56,11 +56,10 @@ export default class CartManager {
       }
 
       const cart = gCart[cartIndex]
-      console.log(cart, 'hola')
       if (cart && cart.products) {
         const prodIndex = cart.products.findIndex((p) => p.id === pid)
 
-        if (prodIndex  === 1) {
+        if (prodIndex !== -1) {
           cart.products[prodIndex].quantity++
         } else {
           const newProd = {

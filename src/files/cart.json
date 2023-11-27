@@ -4,7 +4,11 @@
 		"products": [
 			{
 				"id": "2a682e86-da16-4adf-ab9a-dbfbfa218bbd",
-				"quantity": 1
+				"quantity": 3
+			},
+			{
+				"id": "da7b08ab-8291-45d3-9380-b2a54c604ef5",
+				"quantity": 2
 			}
 		]
 	},
