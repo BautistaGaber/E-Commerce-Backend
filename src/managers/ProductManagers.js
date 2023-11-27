@@ -28,6 +28,13 @@ export default class ProductManager {
   }
 
   addProducts = async (product) => {
+    const requiredFields = ['title', 'description', 'price', 'thumbnail', 'code', 'stock', 'category']
+    const missingFields = requiredFields.filter(field => !(field in product))
+
+    if(missingFields.length > 0){
+      return console.log(`Los siguientes campos son obligatorios: ${missingFields.join(', ')}`);
+    }
+
     const products = await this.getProducts()
     const prodExists = products.find((p) => p.code === product.code)
     if (!prodExists) {
