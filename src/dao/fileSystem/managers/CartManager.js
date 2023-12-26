@@ -1,9 +1,7 @@
 import fs from 'fs'
-import getProductsById from '../managers/ProductManagers.js'
 import { randomUUID } from 'crypto'
-import ProductManager from '../managers/ProductManagers.js'
 
-const productManager = new ProductManager('./src/files/products.json')
+// const productManager = new ProductManager('./src/files/products.json')
 
 export default class CartManager {
   constructor(path) {

@@ -1,0 +1,36 @@
+<h2>Products</h2>
+
+<form id="add" method="post">
+    <label for="Title"><strong>Titulo: </strong></label>
+    <input type="text" id="title" name="title"><br>
+    <label for="Description"><strong>Description: </strong></label>
+    <input type="text" id="description" name="description"><br>
+    <label for="Code"><strong>Code: </strong></label>
+    <input type="text" id="code" name="code"><br>
+    <label for="Price"><strong>Price: </strong></label>
+    <input type="number" id="price" name="price"><br>
+    <label for="Stock"><strong>Stock: </strong></label>
+    <input type="number" id="stock" name="stock"><br>
+    <label for="Category"><strong>Category: </strong></label>
+    <input type="text" id="category" name="category"><br>
+    <label for="Thumbnail"><strong>Thumbnail: </strong></label>
+    <input type="text" id="thumbnail" name="thumbnail"><br>
+    <button type="submit" id="cargar">Cargar</button>
+</form>
+
+<div>
+    <h2>Eliminar producto por id</h2>
+    <form method="post" class="Form" id="deleteForm" data-action="delete">
+        <label for="Id"><strong>Id: </strong></label>
+        <input type="text" id="idProduct" name="idProduct" required><br>
+        <button type="button" id="delete">Eliminar</button>
+    </form>
+</div>
+
+<h2>Lista de productos</h2>
+<div id="updateList">
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/index.js"></script>

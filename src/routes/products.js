@@ -1,53 +1,67 @@
-import ProductManager from '../managers/ProductManagers.js'
-import { Router } from 'express'
+import { randomUUID } from "crypto";
+import { Router } from "express";
+import productModel from "../dao/fileSystem/mongodb/models/product.model.js";
 
-const router = Router()
-const productManager = new ProductManager('./src/files/products.json')
+const router = Router();
 
+router.get("/", async (req, res) => {
+  const { page = 1, limit = 10, sort, category, status } = req.query;
+  const queryOptions = {};
 
-router.get('/', async (req, res) => {
-  const products = await productManager.getProducts()
-  const limit = req.query.limit
-
-  if (!limit || limit > products.length || limit <= 0) {
-    res.json({ products: products })
-  } else {
-    res.json({ products: products.slice(0, limit) })
+  if (category) {
+    queryOptions.category = category;
   }
-})
 
-router.get('/:pid', async (req, res) => {
-  const productId = req.params.pid
-  const product = await productManager.getProductsById(productId)
-  console.log(product)
+  if(status === "avaliable"){
+    queryOptions.stock = {$gt: 0}
+  }else if(status === "unavailable"){
+    queryOptions.stock = {$eq: 0}
+  }
+
+  const products = await productModel.paginate(queryOptions, {
+    limit: limit,
+    page: page ?? 1,
+    sort: sort ? { price: sort === "desc" ? -1 : 1 } : undefined,
+    lean: true,
+  });
+  console.log(products);
+  res.render("products", { products: products });
+});
+
+router.get("/:pid", async (req, res) => {
+  const productsId = await productModel.find(
+    (product) => product.id === req.params.pid
+  );
+  const product = await productModel.findById(productsId);
 
   if (!product) {
-    res.json({ error: 'producto no encontrado' })
+    res.json({ error: "producto no encontrado" });
   } else {
-    res.json({ product: product })
+    res.json({ product });
   }
-})
+});
 
-router.post('/', async (req, res) => {
-    const prod = req.body
-    const products = await productManager.addProducts(prod)
-    res.json(products)
-})
+router.post("/", async (req, res) => {
+  const prod = req.body;
+  prod.id = randomUUID();
+  const products = await productModel.create(prod);
+  res.json(products);
+});
 
-router.put('/:pid', async (req, res) => {
-    const productId = req.params.pid
-    const prod = req.body
-    const products = await productManager.updateProducts(productId, prod)
-    res.send({ 
-        status: 'success',
-        products: products
-     })
-})
+router.put("/:pid", async (req, res) => {
+  const productId = req.params.pid;
+  const prod = req.body;
+  const products = await productModel.findByIdAndUpdate(productId, prod);
+  res.send({
+    status: "success",
+    products: products,
+  });
+});
 
-router.delete('/:pid', async (req, res) => {
-  const productId = req.params.pid
-  const products = await productManager.deleteProducts(productId)
-  res.json(products)
-})
+router.delete("/:pid", async (req, res) => {
+  const productId = req.params.pid;
+  const products = await productModel.findByIdAndDelete(productId);
+  res.json(products);
+});
 
-export { router as productsRouter }
+export { router as productsRouter };
