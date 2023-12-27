@@ -2,7 +2,6 @@
     <h1>
         Products
     </h1>
-
     <ul>
         {{#each products.docs}}
         <li>
@@ -13,7 +12,12 @@
             {{this.stock}}
             {{this.category}}
             {{this.thumbnail}}
-            <button>Agregar al carrito</button>
+            <form action="/api/carts/addToCart" method="post">
+                <label for="cid">Carrito ID</label>
+                <input type="text" id="cid" name="cid" required>
+                <input type="hidden" name="pid" value="{{this._id}}">
+                <button type="submit">agregar al carrito</button>
+            </form>
         </li>
         {{/each}}
     </ul>

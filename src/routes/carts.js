@@ -13,11 +13,14 @@ router.get("/:cid", async (req, res) => {
   const cartId = req.params.cid;
   try {
     const cart = await cartModel.findById(cartId).populate("products.product");
-    console.log(JSON.stringify(cart, null, '/t'));
+    console.log(JSON.stringify(cart, null, "/t"));
 
-    const {products} = cart;
+    const { products } = cart;
 
-    res.render("carts", {cart: cartId, products: products.map(p => p.toJSON())});
+    res.render("carts", {
+      cart: cartId,
+      products: products.map((p) => p.toJSON()),
+    });
     //res.json(cart);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -30,9 +33,9 @@ router.post("/", async (req, res) => {
   res.json(newCart);
 });
 
-router.post("/:cid/products/:pid", async (req, res) => {
+router.post("/addToCart", async (req, res) => {
+  const { cid, pid } = req.body;
   try {
-    const { cid, pid } = req.params;
     const cart = await cartModel.findById(cid);
     const product = await productModel.findById(pid);
     if (!cart) {
@@ -49,7 +52,7 @@ router.post("/:cid/products/:pid", async (req, res) => {
     }
     await cart.save();
 
-    res.json(cart);
+    res.redirect("/api/products");
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
