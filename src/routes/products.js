@@ -12,19 +12,20 @@ router.get("/", async (req, res) => {
     queryOptions.category = category;
   }
 
-  if(status === "avaliable"){
-    queryOptions.stock = {$gt: 0}
-  }else if(status === "unavailable"){
-    queryOptions.stock = {$eq: 0}
+  if (status === "avaliable") {
+    queryOptions.stock = { $gt: 0 };
+  } else if (status === "unavailable") {
+    queryOptions.stock = { $eq: 0 };
   }
 
   const products = await productModel.paginate(queryOptions, {
     limit: limit,
     page: page ?? 1,
-    sort: sort ? { price: sort === "desc" ? -1 : 1 } : undefined,
+    sort: sort
+      ? { price: sort === "desc" ? -1 : sort === "asc" ? 1 : 0 }
+      : undefined,
     lean: true,
   });
-  console.log(products);
   res.render("products", { products: products });
 });
 
