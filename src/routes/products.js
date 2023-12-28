@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
       : undefined,
     lean: true,
   });
-  res.render("products", { products: products });
+  res.json(products);
 });
 
 router.get("/:pid", async (req, res) => {

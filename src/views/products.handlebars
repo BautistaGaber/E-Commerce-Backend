@@ -12,7 +12,7 @@
             {{this.stock}}
             {{this.category}}
             {{this.thumbnail}}
-            <form action="/api/carts/addToCart" method="post">
+            <form action="/views/products/addToCart" method="post">
                 <label for="cid">Carrito ID</label>
                 <input type="text" id="cid" name="cid" required>
                 <input type="hidden" name="pid" value="{{this._id}}">
@@ -25,13 +25,13 @@
     <div>
         ||
         {{#if products.hasPrevPage}}
-        <a href="/api/products?page={{products.prevPage}}">anterior</a>
+        <a href="/views/products?page={{products.prevPage}}">anterior</a>
         {{/if}}
         ||
         <span>Pagina {{products.page}} de {{products.totalPages}}</span>
         ||
         {{#if products.hasNextPage}}
-        <a href="/api/products?page={{products.nextPage}}">siguiente</a>
+        <a href="/views/products?page={{products.nextPage}}">siguiente</a>
         {{/if}}
         ||
     </div>
