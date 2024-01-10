@@ -9,8 +9,12 @@ import mongoose from "mongoose";
 import productModel from "./dao/fileSystem/mongodb/models/product.model.js";
 import { messageRouter } from "./routes/message.js";
 import messageModel from "./dao//fileSystem/mongodb/models/message.model.js";
+import { userRouter } from "./routes/user.js";
+import session from "express-session";
+import MongoStore from "connect-mongo";
 
 const app = express();
+const PORT = 8080;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -20,17 +24,34 @@ app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", __dirname + "/views");
 
-app.use("/api/products", productsRouter);
-app.use("/api/carts", cartsRouter);
-app.use("/api/message", messageRouter);
-app.use("/views", viewRouter);
-
 const MONGO =
   "mongodb+srv://bautistagaber:UZ7N4k7m88BIAs2L@cluster0.hdnj5k1.mongodb.net/segunda-preentrega";
 
 const connection = mongoose.connect(MONGO);
 
-const PORT = 8080;
+app.use(
+  session({
+    store: new MongoStore({
+      mongoUrl: MONGO,
+    }),
+    secret: "1234",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use("/api/products", productsRouter);
+app.use("/api/carts", cartsRouter);
+app.use("/api/message", messageRouter);
+app.use("/views", viewRouter);
+app.use("/users", userRouter);
+
+app.get("/", (req, res) => {
+  req.session.user = "Active Session";
+  console.log(req.session.user);
+  res.send("Session Set");
+});
+
 const httpServer = app.listen(PORT, () =>
   console.log(`Server running on port: ${PORT}`)
 );

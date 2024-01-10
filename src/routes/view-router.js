@@ -81,4 +81,16 @@ router.post("/products/addToCart", async (req, res) => {
   }
 });
 
+router.get("/users/register", (req, res) => {
+  res.render("register");
+});
+
+router.get("/users/login", (req, res) => {
+  res.render("login");
+});
+
+router.get("/users", (req, res) => {
+  res.render("profile", { user: req.session.user });
+});
+
 export { router as viewRouter };

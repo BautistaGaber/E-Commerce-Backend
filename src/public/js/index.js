@@ -157,3 +157,6 @@ message.addEventListener("keypress", () => {
 socket.on("chat:typing", (user) => {
   actions.innerHTML = `<p>${user} is writing a message...</p>`;
 });
+
+
+
