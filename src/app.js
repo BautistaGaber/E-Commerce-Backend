@@ -12,6 +12,8 @@ import messageModel from "./dao//fileSystem/mongodb/models/message.model.js";
 import { userRouter } from "./routes/user.js";
 import session from "express-session";
 import MongoStore from "connect-mongo";
+import inicializePassport from "./config/passport.config.js";
+import passport from "passport";
 
 const app = express();
 const PORT = 8080;
@@ -19,10 +21,6 @@ const PORT = 8080;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(__dirname + "/public"));
-
-app.engine("handlebars", engine());
-app.set("view engine", "handlebars");
-app.set("views", __dirname + "/views");
 
 const MONGO =
   "mongodb+srv://bautistagaber:UZ7N4k7m88BIAs2L@cluster0.hdnj5k1.mongodb.net/segunda-preentrega";
@@ -39,6 +37,13 @@ app.use(
     saveUninitialized: false,
   })
 );
+   
+inicializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
+app.engine("handlebars", engine());
+app.set("view engine", "handlebars");
+app.set("views", __dirname + "/views");
 
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
