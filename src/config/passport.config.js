@@ -44,23 +44,7 @@ const inicializePassport = () => {
         callbackURL: "http://localhost:8080/users/githubcallback",
       },
       async (accessToken, refreshToken, profile, done) => {
-        try {
-          console.log(profile);
-          let user = await userModel.findOne({ email: profile.json.email });
-          if (!user) {
-            let newUser = {
-              firstName: profile.json.firstName,
-              lastName: "",
-              age: 18,
-              email: profile.__json.email,
-              password: "",
-            };
-            let result = await userModel.create(newUser);
-            done(null, result);
-          } else {
-            done(null, user);
-          }
-        } catch {}
+        done(null, profile);
       }
     )
   );
@@ -86,10 +70,11 @@ const inicializePassport = () => {
     )
   );
 
-  passport.serializeUser((user, done) => done(null, user._id));
+  passport.serializeUser(function (user, done) {
+    done(null, user);
+  });
 
-  passport.deserializeUser(async (id, done) => {
-    let user = await userModel.findById(id);
+  passport.deserializeUser(function (user, done) {
     done(null, user);
   });
 };

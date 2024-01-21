@@ -42,17 +42,26 @@ router.get("/faillogin", (req, res) => {
 
 router.get(
   "/github",
-  passport.authenticate("github", { scope: ["user:email"] }),
+  passport.authenticate("github", { scope: ["user:email"], session: false }),
   async (req, res) => {}
 );
 
+// router.get(
+//   "/githubcallback",
+//   passport.authenticate("github", { failureRedirect: "/login" }),
+//   async (req, res) => {
+//     req.session.user = req.user;
+//     res.redirect("/");
+//   }
+// );
+
 router.get(
-  "/githubcallback",
-  passport.authenticate("github", { failureRedirect: "/login" }),
+  '/githubcallback',
+  passport.authenticate('github', { scope: ['user:email'], sesion: false }),
   async (req, res) => {
-    req.session.user = req.user;
-    res.redirect("/");
+    console.log(req.user)
+    res.redirect('/views/home')
   }
-);
+)
 
 export { router as userRouter };
