@@ -1,6 +1,3 @@
-import userModel from "../dao/fileSystem/mongodb/models/user.model.js";
-import { createHash, validatePassword } from "../utils.js";
-
 class UserController {
   static register = async (req, res) => {
     res.send({ status: "success", message: "User registered successfully" });

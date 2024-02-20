@@ -1,66 +1,70 @@
 import { randomUUID } from "crypto";
-import productModel from "../dao/fileSystem/mongodb/models/product.model.js";
+import { productDao } from "../dao/index.js";
 
 class ProductController {
   static getProducts = async (req, res) => {
-    const { page = 1, limit = 10, sort, category, status } = req.query;
-    const queryOptions = {};
+    try {
+      let { page = 1, limit = 10, sort, category, status } = req.query;
 
-    if (category) {
-      queryOptions.category = category;
+      const products = await productDao.getProduct(
+        page,
+        limit,
+        sort,
+        category,
+        status
+      );
+      res.json(products);
+    } catch (err) {
+      return res.status(404).send({ status: "error", message: error.message });
     }
-
-    if (status === "avaliable") {
-      queryOptions.stock = { $gt: 0 };
-    } else if (status === "unavailable") {
-      queryOptions.stock = { $eq: 0 };
-    }
-
-    const products = await productModel.paginate(queryOptions, {
-      limit: limit,
-      page: page ?? 1,
-      sort: sort
-        ? { price: sort === "desc" ? -1 : sort === "asc" ? 1 : 0 }
-        : undefined,
-      lean: true,
-    });
-    res.json(products);
   };
 
   static getProductById = async (req, res) => {
-    const productsId = await productModel.find(
-      (product) => product.id === req.params.pid
-    );
-    const product = await productModel.findById(productsId);
-
-    if (!product) {
-      res.json({ error: "producto no encontrado" });
-    } else {
-      res.json({ product });
+    try {
+      const id = req.params.id;
+      const productsId = await productDao.getProductById(id);
+      return res.json({ product });
+    } catch (err) {
+      return res.status(404).send({ status: "error", message: error.message });
     }
   };
 
   static addProduct = async (req, res) => {
-    const prod = req.body;
-    prod.id = randomUUID();
-    const products = await productModel.create(prod);
-    res.json(products);
+    try {
+      const prod = req.body;
+      prod.id = randomUUID();
+      const products = await productDao.addProduct(prod);
+      return res.json(products);
+    } catch (err) {
+      return res.status(404).send({ status: "error", message: error.message });
+    }
   };
 
   static updateProduct = async (req, res) => {
-    const productId = req.params.pid;
-    const prod = req.body;
-    const products = await productModel.findByIdAndUpdate(productId, prod);
-    res.send({
-      status: "success",
-      products: products,
-    });
+    try {
+      const productId = req.params.pid;
+      const newProduct = req.body;
+      const products = await productDao.updateProductById(
+        productId,
+        newProduct
+      );
+      return res.send({
+        status: "success",
+        products: products,
+      });
+    } catch (err) {
+      return res.status(404).send({ status: "error", message: error.message });
+    }
   };
 
   static deleteProduct = async (req, res) => {
-    const productId = req.params.pid;
-    const products = await productModel.findByIdAndDelete(productId);
-    res.json(products);
+    try {
+      const productId = req.params.pid;
+      const products = await productDao.deleteProductById(productId);;
+      return res.json(products);
+    } catch (err) {
+      return res.status(404).send({ status: "error", message: error.message });
+    }
   };
 }
 
