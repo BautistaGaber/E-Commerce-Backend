@@ -2,6 +2,8 @@
 
 const form = document.getElementById("loginForm");
 
+let resultOk = false;
+
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -15,11 +17,18 @@ form.addEventListener("submit", (e) => {
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((result) => {
-    if (result.status === 200) {
-      window.location.replace("/views/users");
-    }else{
-      console.log(result);
-    }
-  });
+  })
+    .then((result) => {
+      if (result.status === 200) {
+        window.location.replace("/views/users");
+      } else {
+        console.log(result);
+      }
+    })
+    .then((token) => {
+      if (resultOK) {
+        localStorage.setItem("token", token);
+        window.location.replace("/views/users");
+      }
+    });
 });

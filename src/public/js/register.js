@@ -2,6 +2,8 @@
 
 const form = document.getElementById("registerForm");
 
+let resultOk = false;
+
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -16,6 +18,17 @@ form.addEventListener("submit", (e) => {
       "Content-Type": "application/json",
     },
   })
-    .then((result) => result.json())
-    .then((json) => console.log(json));
+    .then((result) => {
+      if (result.status === 200) {
+        resultOk = true;
+        return result.text();
+      }
+    })
+    .then((token) => {
+      if (resultOk) {
+        localStorage.setItem("token", token);
+        window.location.replace("/views/home");
+      }
+      console.log(resultOk);
+    });
 });

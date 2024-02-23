@@ -15,7 +15,7 @@ router.get("/failregister", async (req, res) => {
 });
 
 router.post(
-  "login",
+  "/login",
   passport.authenticate("login", { failureRedirect: "" }),
   UserController.login
 );

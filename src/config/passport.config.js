@@ -26,6 +26,20 @@ const inicializePassport = () => {
             email,
             password: createHash(password),
           };
+          const mailOptions = {
+            to: email,
+            subject: "Bienvenido a E-commerce",
+            text: "welcome",
+          };
+
+          transporter.sendMail(mailOptions, (err, res) => {
+            if (err) {
+              console.log(err);
+              return;
+            } else {
+            }
+          });
+
           const result = await userModel.create(newUser);
           return done(null, result);
         } catch (err) {
