@@ -1,6 +1,5 @@
-import cartModel from "../dao/fileSystem/mongodb/models/cart.model.js";
 import productModel from "../dao/fileSystem/mongodb/models/product.model.js";
-import { cartDao } from "../dao/index.js";
+import { cartDao, ticketDao, userDao } from "../dao/index.js";
 
 class CartController {
   static getCart = async (req, res) => {
@@ -71,7 +70,7 @@ class CartController {
       const { quantity } = req.body;
       const result = await cartDao.updateProdToCart(cid, pid, quantity);
       return res.json({ status: "success", message: result });
-    } catch(error) {
+    } catch (error) {
       return res.status(404).send({ status: "error", message: error.message });
     }
   };
@@ -92,6 +91,59 @@ class CartController {
       const result = await cartDao.deleteProdToCart(cid, pid);
 
       return res.json({ status: "success", message: result });
+    } catch (error) {
+      return res.status(404).send({ status: "error", message: error.message });
+    }
+  };
+
+  static addPurchase = async (req, res) => {
+    try {
+      const cid = req.body.cid;
+      const cart = await cartDao.getCartById(cid);
+
+      if (!cart) {
+        return res
+          .status(404)
+          .send({ status: "error", message: "Cart not found" });
+      }
+
+      for (const item of cart.items) {
+        const product = await productModel.findById(item.productId);
+        if (!product) {
+          return res
+            .status(404)
+            .send({ status: "error", message: "Producto no encontrado." });
+        }
+      }
+
+      if (product.stock < item.quantity) {
+        return res
+          .status(400)
+          .send({
+            status: "error",
+            message: `No hay suficiente stock para el producto ${product.title}.`,
+          });
+      }
+
+      const user = await userDao.getUserByCart(cart)
+
+      const ticket = {
+        code: Math.floor(Math.random() * 1000000),
+        purchase_datetime: new Date(),
+        amount: cart.totalPrice,
+        purchase: user.email,
+      };
+
+      const newTicket = await ticketDao.createTicket(ticket);
+
+      for (const item of cart.items) {
+        const product = await productModel.findById(item.productId);
+        product.stock -= item.quantity;
+        await product.save();
+      }
+
+      return res.json({ status: "success", message: newTicket }); 
+
     } catch (error) {
       return res.status(404).send({ status: "error", message: error.message });
     }
