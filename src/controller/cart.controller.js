@@ -1,3 +1,4 @@
+import { PurchaseProductDTO } from "../DTOs/purchaseProduct.js";
 import productModel from "../dao/fileSystem/mongodb/models/product.model.js";
 import { cartDao, ticketDao, userDao } from "../dao/index.js";
 
@@ -97,9 +98,10 @@ class CartController {
   };
 
   static addPurchase = async (req, res) => {
+    const cartId = req.params.cid;
     try {
-      const cid = req.body.cid;
-      const cart = await cartDao.getCartById(cid);
+      const cart = await cartDao.getCartById(cartId);
+      let productsToPurchase = []
 
       if (!cart) {
         return res
@@ -107,25 +109,28 @@ class CartController {
           .send({ status: "error", message: "Cart not found" });
       }
 
-      for (const item of cart.items) {
-        const product = await productModel.findById(item.productId);
-        if (!product) {
-          return res
-            .status(404)
-            .send({ status: "error", message: "Producto no encontrado." });
-        }
-      }
-
-      if (product.stock < item.quantity) {
+      if (cart.products.length === 0) {
         return res
-          .status(400)
-          .send({
-            status: "error",
-            message: `No hay suficiente stock para el producto ${product.title}.`,
-          });
+          .status(404)
+          .send({ status: "error", message: "Cart is empty" });
       }
 
-      const user = await userDao.getUserByCart(cart)
+      cart.products.forEach((elem) => {
+        if (elem.product.stock >= elem.quantity) {
+          elem.product.stock = elem.product.stock - elem.quantity;
+          productsToPurchase.push(new PurchaseProductDTO(elem.product));
+          cart.products.filter((product) => product != elem);
+        }
+      });
+      console.log(cart);
+
+      let purchasePrice = 0;
+      productsToPurchase.forEach((elem) => {
+        let totalPerElement = elem.price * elem.quantity;
+        purchasePrice += totalPerElement;
+      });
+
+      const user = await userDao.getUserByCart(cart);
 
       const ticket = {
         code: Math.floor(Math.random() * 1000000),
@@ -136,14 +141,7 @@ class CartController {
 
       const newTicket = await ticketDao.createTicket(ticket);
 
-      for (const item of cart.items) {
-        const product = await productModel.findById(item.productId);
-        product.stock -= item.quantity;
-        await product.save();
-      }
-
-      return res.json({ status: "success", message: newTicket }); 
-
+      return res.json({ status: "success", message: newTicket });
     } catch (error) {
       return res.status(404).send({ status: "error", message: error.message });
     }

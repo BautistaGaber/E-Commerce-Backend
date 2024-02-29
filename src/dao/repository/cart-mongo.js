@@ -5,6 +5,7 @@ class CartMongo {
   constructor() {
     this.model = cartModel;
   }
+
   async getCart() {
     try {
       const cart = await cartModel.find();
@@ -14,10 +15,9 @@ class CartMongo {
     }
   }
 
-  async getCartById() {
+  async getCartById(id) {
     try {
-      const cartId = req.params.cid;
-      const cart = await cartModel.findById(cartId);
+      const cart = await cartModel.findById(id);
       return cart;
     } catch (err) {
       throw new Error(err.message);

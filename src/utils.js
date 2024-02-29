@@ -2,8 +2,35 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Faker, en } from "@faker-js/faker";
 
 const PRIVATE_KEY = "jwt-private-key";
+
+export const customFaker = new Faker({ locale: [en] });
+
+const {
+  commerce,
+  image,
+  database,
+  string,
+  internet,
+  person,
+  phone,
+  datatype,
+  lorem,
+} = customFaker;
+
+export const generateFakeProduct = () => {
+  return {
+    id: database.mongodbObjectId(),
+    title: commerce.productName(),
+    description: commerce.productDescription(),
+    price: parseFloat(commerce.price()),
+    stock: parseInt(string.numeric(2)),
+    thumbnail: internet.email(),
+    code: string.alphanumeric(10),
+  };
+};
 
 export const validateAdminRole = (req, res, next) => {
   const user = req.session.user;
@@ -17,15 +44,15 @@ export const validateAdminRole = (req, res, next) => {
 };
 
 export const validateUserRole = (req, res, next) => {
-  const user = req.session.user
+  const user = req.session.user;
   if (!user) {
-    return res.status(401).send({ status: 'error', error: 'Unhaunthorized' })
-  } else if (user.role !== 'user') {
-    return res.status(403).send({ status: 'error', error: 'Forbidden' })
+    return res.status(401).send({ status: "error", error: "Unhaunthorized" });
+  } else if (user.role !== "user") {
+    return res.status(403).send({ status: "error", error: "Forbidden" });
   } else {
-    next()
+    next();
   }
-}
+};
 
 export const generateToken = (user) => {
   const token = jwt.sign({ user }, PRIVATE_KEY, { expiresIn: "1h" });

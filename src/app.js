@@ -1,20 +1,21 @@
 import express from "express";
-import { engine } from "express-handlebars";
+import mongoose from "mongoose";
 import __dirname from "./utils.js";
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import passport from "passport";
+import 'dotenv/config';
+import { engine } from "express-handlebars";
 import { Server } from "socket.io";
 import { productsRouter } from "./routes/products.js";
 import { viewRouter } from "./routes/view-router.js";
 import { cartsRouter } from "./routes/carts.js";
-import mongoose from "mongoose";
-import productModel from "./dao/fileSystem/mongodb/models/product.model.js";
 import { messageRouter } from "./routes/message.js";
-import messageModel from "./dao//fileSystem/mongodb/models/message.model.js";
+import { mockRouter } from "./routes/mock.js";
 import { userRouter } from "./routes/user.js";
-import session from "express-session";
-import MongoStore from "connect-mongo";
+import productModel from "./dao/fileSystem/mongodb/models/product.model.js";
+import messageModel from "./dao//fileSystem/mongodb/models/message.model.js";
 import inicializePassport from "./config/passport.config.js";
-import passport from "passport";
-import 'dotenv/config';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -48,6 +49,7 @@ app.use("/api/carts", cartsRouter);
 app.use("/api/message", messageRouter);
 app.use("/views", viewRouter);
 app.use("/users", userRouter);
+app.use("/mock", mockRouter);
 
 app.get("/", (req, res) => {
   req.session.user = "Active Session";
