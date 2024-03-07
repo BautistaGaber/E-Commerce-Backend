@@ -15,7 +15,8 @@ class ProductController {
       );
       res.json(products);
     } catch (err) {
-      return res.status(404).send({ status: "error", message: error.message });
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -25,7 +26,8 @@ class ProductController {
       const productsId = await productDao.getProductById(id);
       return res.json({ product });
     } catch (err) {
-      return res.status(404).send({ status: "error", message: error.message });
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -36,7 +38,8 @@ class ProductController {
       const products = await productDao.addProduct(prod);
       return res.json(products);
     } catch (err) {
-      return res.status(404).send({ status: "error", message: error.message });
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -53,7 +56,8 @@ class ProductController {
         products: products,
       });
     } catch (err) {
-      return res.status(404).send({ status: "error", message: error.message });
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -63,7 +67,8 @@ class ProductController {
       const products = await productDao.deleteProductById(productId);;
       return res.json(products);
     } catch (err) {
-      return res.status(404).send({ status: "error", message: error.message });
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 }

@@ -10,8 +10,9 @@ class CartController {
         status: "success",
         message: cart,
       });
-    } catch {
-      return res.status(404).send({ status: "error", message: error.message });
+    } catch(err) {
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -23,8 +24,9 @@ class CartController {
         status: "success",
         message: cart,
       });
-    } catch (error) {
-      return res.status(404).send({ status: "error", message: error.message });
+    } catch (err) {
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -36,8 +38,9 @@ class CartController {
         status: "success",
         message: newCart,
       });
-    } catch (error) {
-      return res.status(404).send({ status: "error", message: error.message });
+    } catch (err) {
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -46,8 +49,9 @@ class CartController {
       const { cid, pid } = req.params;
       const cart = await cartDao.addProdToCart(cid, pid);
       return res.json({ status: "success", message: cart });
-    } catch (error) {
-      return res.status(404).send({ status: "error", message: error.message });
+    } catch (err) {
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -60,8 +64,9 @@ class CartController {
         status: "success",
         cart: cart,
       });
-    } catch (error) {
-      return res.status(404).send({ status: "error", message: error.message });
+    } catch (err) {
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -71,8 +76,9 @@ class CartController {
       const { quantity } = req.body;
       const result = await cartDao.updateProdToCart(cid, pid, quantity);
       return res.json({ status: "success", message: result });
-    } catch (error) {
-      return res.status(404).send({ status: "error", message: error.message });
+    } catch (err) {
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -81,8 +87,9 @@ class CartController {
       const cid = req.params.cid;
       const result = await cartDao.deleteCart(cid);
       return res.json({ status: "success", message: result });
-    } catch (error) {
-      return res.status(404).send({ status: "error", message: error.message });
+    } catch (err) {
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -92,8 +99,9 @@ class CartController {
       const result = await cartDao.deleteProdToCart(cid, pid);
 
       return res.json({ status: "success", message: result });
-    } catch (error) {
-      return res.status(404).send({ status: "error", message: error.message });
+    } catch (err) {
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 
@@ -142,8 +150,9 @@ class CartController {
       const newTicket = await ticketDao.createTicket(ticket);
 
       return res.json({ status: "success", message: newTicket });
-    } catch (error) {
-      return res.status(404).send({ status: "error", message: error.message });
+    } catch (err) {
+      req.logger.error(err.message);
+      return res.status(404).send({ status: "error", message: err.message });
     }
   };
 }

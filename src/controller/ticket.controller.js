@@ -7,7 +7,8 @@ class TicketController{
             const newTicket = await ticketDao.createTicket(ticket);
             return res.json(newTicket);
         } catch (err) {
-            return res.status(404).send({ status: "error", message: error.message });
+            req.logger.error(err.message);
+            return res.status(404).send({ status: "error", message: err.message });
         }
     }
 }
