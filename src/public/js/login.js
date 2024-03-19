@@ -20,13 +20,14 @@ form.addEventListener("submit", (e) => {
   })
     .then((result) => {
       if (result.status === 200) {
-        window.location.replace("/views/users");
+        resultOk = true;
+        return result.text();
       } else {
         console.log(result);
       }
     })
     .then((token) => {
-      if (resultOK) {
+      if (resultOk) {
         localStorage.setItem("token", token);
         window.location.replace("/views/users");
       }

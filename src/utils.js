@@ -3,6 +3,8 @@ import { dirname } from "path";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Faker, en } from "@faker-js/faker";
+import {transporter}  from "./config/gmail.js";
+import { options } from "./config/config.js";
 
 const PRIVATE_KEY = "jwt-private-key";
 
@@ -53,6 +55,23 @@ export const validateUserRole = (req, res, next) => {
     next();
   }
 };
+
+export const verifyEmailToken = (token)=>{
+  try {
+      const info = jwt.verify(token,options.gmail.emailToken);
+      console.log(info);
+      return info.email;
+  } catch (error) {
+      console.log(error.message);
+      return null;
+  }
+}
+
+export const generateEmailToken = (email, expireTime) =>{
+  const token = jwt.sign({email},options.gmail.emailToken,{expiresIn:expireTime});
+  return token;
+
+}
 
 export const generateToken = (user) => {
   const token = jwt.sign({ user }, PRIVATE_KEY, { expiresIn: "1h" });

@@ -1,12 +1,13 @@
 import { Router } from "express";
 import passport from "passport";
 import { UserController } from "../controller/user.controller.js";
+import { checkRol } from "../middlewares/auth.js";
 
 const router = new Router();
 
 router.post(
   "/register",
-  passport.authenticate("register", { failureRedirect: "" }),
+  passport.authenticate("register", { failureRedirect: "/register" }),
   UserController.register
 );
 
@@ -16,7 +17,7 @@ router.get("/failregister", async (req, res) => {
 
 router.post(
   "/login",
-  passport.authenticate("login", { failureRedirect: "" }),
+  passport.authenticate("login", { failureRedirect: "/login" }),
   UserController.login
 );
 
@@ -35,5 +36,11 @@ router.get(
   passport.authenticate("github", { scope: ["user:email"], sesion: false }),
   UserController.gitHubCallback
 );
+
+router.put("/premium/:uid", checkRol(["admin"]),  UserController.changeRole);
+
+router.post("/forgot-password", UserController.forgotPassword);
+
+router.post("/reset-password", UserController.resetPassword);
 
 export { router as userRouter };

@@ -9,6 +9,10 @@ const productSchema = new mongoose.Schema({
   thumbnail: { type: String, required: true, max: 100 },
   stock: { type: Number, required: true },
   code: { type: String, required: true, max: 100 },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "users",
+  },
 });
 
 productSchema.plugin(mongoosePaginate);

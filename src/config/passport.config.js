@@ -73,9 +73,7 @@ const inicializePassport = () => {
           if (!user) {
             return done(null, false);
           }
-          if (!validatePassword(password, user)) {
-            return done(null, false);
-          }
+          if (!validatePassword(password, user))
           return done(null, user);
         } catch (err) {
           return done(err);
