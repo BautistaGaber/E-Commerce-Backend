@@ -27,7 +27,7 @@ form.addEventListener("submit", (e) => {
     .then((token) => {
       if (resultOk) {
         localStorage.setItem("token", token);
-        window.location.replace("/views/home");
+        window.location.replace("/views/users/login");
       }
       console.log(resultOk);
     });

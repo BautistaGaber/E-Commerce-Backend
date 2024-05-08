@@ -2,8 +2,9 @@ import jwt from "jsonwebtoken";
 
 export const checkRol = (roles) => {
   return (req, res, next) => {
+    console.log(req.user);
     if (!req.user) {
-      return res.json8({ status: "error", message: "need to be authorized" });
+      return res.json({ status: "error", message: "need to be authorized" });
     }
     if (roles.includes(req.user.role)) {
       return res.json({ status: "error", message: "unauthorized" });

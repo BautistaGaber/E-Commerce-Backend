@@ -62,19 +62,21 @@ class ProductMongo {
   async updateProductById(productId, newProduct) {
     try {
       if (
-        product.title === undefined ||
-        product.description === undefined ||
-        product.code === undefined ||
-        product.price === undefined ||
-        product.stock === undefined ||
-        product.category === undefined
+        newProduct.title === undefined ||
+        newProduct.description === undefined ||
+        newProduct.code === undefined ||
+        newProduct.price === undefined ||
+        newProduct.stock === undefined ||
+        newProduct.category === undefined
       ) {
         throw new Error("Missing fields");
       }
-      const result = await productModel.findByIdAndUpdate(
+      const result = await productModel.updateOne(
         { _id: productId },
         { $set: newProduct }
       );
+      console.log("resultado updbyId", result);
+      return result;
     } catch (err) {
       throw new Error(err.message);
     }

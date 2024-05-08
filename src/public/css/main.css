@@ -1,0 +1,31 @@
+* {
+    margin: 0;
+    /* espacio interior */
+    padding: 0;
+    /* espacio Exterior */
+    box-sizing: border-box;
+    /* resetea la caja del navegador */ }
+
+header{
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+
+}
+
+header nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+}
+
+header nav li{
+    list-style: none;
+}
+
+header nav li a{
+    text-decoration: none;
+    color: white;
+}

@@ -1,7 +1,7 @@
 <div>
     <div>
         <h1>Cart</h1>        
-        <p>cartId: {{cart}}</p>
+        <p>User name: {{user.firstName}}</p>
     </div>
 
     <div>
@@ -20,5 +20,9 @@
                 <p>quantity: {{quantity}}</p>
             </li>
             {{/each}}
+        </ul>
+        <form id="cartForm" action="/api/carts/purchase" method="post">
+            <button type="submit">Comprar</button>
+        </form>
     </div>
 </div>

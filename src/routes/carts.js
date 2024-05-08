@@ -4,7 +4,7 @@ import { validateUserRole } from "../utils.js";
 
 const router = Router();
 
-router.get("/", CartController.getCart);
+router.get("/", CartController.getUserCart);
 
 router.get("/:cid", CartController.getCartById);
 
@@ -12,7 +12,7 @@ router.post("/", CartController.addCart);
 
 router.post("/:cid/products/:pid", validateUserRole, CartController.addProdToCart);
 
-router.post("/:cid/purchase", CartController.addPurchase);
+router.post("/purchase", CartController.addPurchase);
 
 router.put("/:cid", CartController.updateCart);
 

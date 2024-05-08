@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import cartModel from "./cart.model.js";
 
 const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true, max: 100 },
@@ -14,7 +15,7 @@ const userSchema = new mongoose.Schema({
   },
   cart: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "carts",
+    ref: cartModel,
   },
 });
 

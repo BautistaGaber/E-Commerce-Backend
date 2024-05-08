@@ -2,7 +2,6 @@
 import { Router } from "express";
 import { ProductController } from "../controller/product.controller.js";
 import { validateAdminRole } from "../utils.js";
-import { checkRol } from "../middlewares/auth.js";
 
 
 const router = Router();
@@ -11,10 +10,16 @@ router.get("/", ProductController.getProducts);
 
 router.get("/:pid", ProductController.getProductById);
 
-router.post("/", checkRol(["admin", "premium"]), ProductController.addProduct);
+// router.post("/", ProductController.addProduct);
 
-router.put("/:pid",checkRol(["admin", "premium"]), ProductController.updateProduct);
+// router.put("/:pid", ProductController.updateProduct);
 
-router.delete("/:pid",checkRol(["admin", "premium"]), ProductController.deleteProduct);
+// router.delete("/:pid", ProductController.deleteProduct);
+
+router.post("/", validateAdminRole, ProductController.addProduct);
+
+router.put("/:pid",validateAdminRole, ProductController.updateProduct);
+
+router.delete("/:pid",validateAdminRole, ProductController.deleteProduct);
 
 export { router as productsRouter };

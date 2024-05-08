@@ -1,16 +1,18 @@
 import { PurchaseProductDTO } from "../DTOs/purchaseProduct.js";
 import productModel from "../dao/fileSystem/mongodb/models/product.model.js";
-import { cartDao, ticketDao, userDao } from "../dao/index.js";
+import { cartDao, productDao, ticketDao, userDao } from "../dao/index.js";
+import { ProductController } from "./product.controller.js";
 
 class CartController {
-  static getCart = async (req, res) => {
+  static getUserCart = async (req, res) => {
     try {
-      const cart = await cartDao.getCart();
-      return res.json({
+      console.log(req.session.user);
+      const result = req.session.user.cart;
+      return res.status(200).json({
         status: "success",
-        message: cart,
+        cartId: result,
       });
-    } catch(err) {
+    } catch (err) {
       req.logger.error(err.message);
       return res.status(404).send({ status: "error", message: err.message });
     }
@@ -47,7 +49,8 @@ class CartController {
   static addProdToCart = async (req, res) => {
     try {
       const { cid, pid } = req.params;
-      const cart = await cartDao.addProdToCart(cid, pid);
+      const quantity = req.body.quantity;
+      const cart = await cartDao.addProdToCart(cid, pid, quantity);
       return res.json({ status: "success", message: cart });
     } catch (err) {
       req.logger.error(err.message);
@@ -106,10 +109,9 @@ class CartController {
   };
 
   static addPurchase = async (req, res) => {
-    const cartId = req.params.cid;
     try {
+      const cartId = req.session.user.cart;
       const cart = await cartDao.getCartById(cartId);
-      let productsToPurchase = []
 
       if (!cart) {
         return res
@@ -123,36 +125,58 @@ class CartController {
           .send({ status: "error", message: "Cart is empty" });
       }
 
-      cart.products.forEach((elem) => {
-        if (elem.product.stock >= elem.quantity) {
-          elem.product.stock = elem.product.stock - elem.quantity;
-          productsToPurchase.push(new PurchaseProductDTO(elem.product));
-          cart.products.filter((product) => product != elem);
+      let totalAmount = 0;
+
+      cart.products.forEach(async (elem) => {
+        try {
+          const product = await productDao.getProductById(elem.product);
+          console.log("product", product);
+
+          if (!product) {
+            throw new Error("Product not found");
+          }
+          product.stock = product.stock - elem.quantity;
+          console.log("stock", product.stock);
+          console.log("id:", product._id);
+          console.log("prod:", product);
+
+          if (product.stock <= 0) {
+            // await CartController.deleteProdToCart(cartId, elem.product); 
+            await productDao.deleteProductById(product._id);
+          } else {
+            productDao.updateProductById(product._id, product);
+          }
+ 
+          totalAmount += product.price * elem.quantity; 
+        } catch (err) { 
+          throw new Error(err.message);
         }
       });
-      console.log(cart);
-
-      let purchasePrice = 0;
-      productsToPurchase.forEach((elem) => {
-        let totalPerElement = elem.price * elem.quantity;
-        purchasePrice += totalPerElement;
-      });
+      console.log("cart", cart);
 
       const user = await userDao.getUserByCart(cart);
 
+      console.log("user:", user);
+
       const ticket = {
-        code: Math.floor(Math.random() * 1000000),
+        code: Math.floor(Math.random() * (1000000 - 1000 + 1)) + 1000,
         purchase_datetime: new Date(),
-        amount: cart.totalPrice,
-        purchase: user.email,
+        amount: totalAmount,
+        purchase: req.session.user.email,
       };
 
-      const newTicket = await ticketDao.createTicket(ticket);
+      await ticketDao.createTicket(ticket);
 
-      return res.json({ status: "success", message: newTicket });
-    } catch (err) {
-      req.logger.error(err.message);
-      return res.status(404).send({ status: "error", message: err.message });
+      console.log(ticket);
+
+      cart.products = [];
+      cart.total = 0;
+
+      await cartDao.updateCart(cartId, cart);
+
+      return res.json({ status: "success", message: ticket });
+    } catch (error) {
+      return res.status(404).send({ status: "error", message: error.message });
     }
   };
 }

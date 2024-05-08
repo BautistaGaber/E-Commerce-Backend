@@ -24,53 +24,66 @@ class CartMongo {
     }
   }
 
-  async addCart(){
-    try{
-      const cart = req.body;
+  async addCart(cart) {
+    try {
       const newCart = await cartModel.create(cart);
       return newCart;
-    }
-    catch(err){
-      throw new Error(err.message);
-    }
-  }
-
-  async addProdToCart() {
-    try {
-      const { cid, pid } = req.params;
-      const cart = await cartModel.findById(cid);
-      const product = await productModel.findById(pid);
-      if (!cart) {
-        res.status(404).json({ message: "Cart not found" });
-      } else if (!product) {
-        res.status(404).json({ message: "Product not found" });
-      }
-      const existingProduct = cart.products.find((p) => p.product == pid);
-      if (existingProduct) {
-        existingProduct.quantity++;
-      } else {
-        cart.products.push({ product: pid, quantity: 1 });
-      }
-      await cart.save();
-      return cart;
     } catch (err) {
       throw new Error(err.message);
     }
   }
 
-  async updateCart() {
+  async addProdToCart(cartId, productId, quantity) {
     try {
-      const cid = req.params;
-      const cartBody = req.body;
-      const cart = await productModel.findByIdAndUpdate(cid, cartBody);
-      return cart;
+      const cart = await cartModel.findOne({ _id: cartId });
+      if (!cart) {
+        throw new Error("Cart not found");
+      }
+
+      const product = await productModel.findOne({ _id: productId });
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      if (quantity > product.stock) {
+        throw new Error("Quantity exceeds stock");
+      }
+
+      const productExistsInCart = cart.products.find((p) => {
+        return p.product._id.toString() === product._id.toString();
+      });
+
+      if (!productExistsInCart) {
+        cart.products.push({ product: productId, quantity: quantity });
+        cart.total = cart.total + product.price * quantity;
+      } else {
+        const index = cart.products.findIndex((p) => {
+          return p.product._id.toString() === product._id.toString();
+        });
+        cart.products[index].quantity += quantity;
+        cart.total = cart.total + product.price * quantity;
+      }
+
+      await productModel.updateOne({_id:productId},{$set: product});
+      const result = await cartModel.updateOne({_id:cartId},{$set: cart});
+      console.log(result);
+      return result;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
+
+  async updateCart(cartId, cart) {
+    try {
+      const updatedCart = await cartModel.updateOne({ _id: cartId }, { $set: cart });
+      return updatedCart;
     } catch (err) {
       throw new Error(err.message);
     }
   }
 
   async updateProdToCart() {
-    try {
+    try { 
       const { cid, pid } = req.params;
       const { quantity } = req.body;
       const cartId = await cartModel.findById(cid);

@@ -3,6 +3,8 @@ import local from "passport-local";
 import userModel from "../dao/fileSystem/mongodb/models/user.model.js";
 import { createHash, validatePassword } from "../utils.js";
 import GitHubStrategy from "passport-github2";
+import { cartDao } from "../dao/index.js";
+import { transporter } from "./gmail.js";
 
 const LocalStrategy = local.Strategy;
 
@@ -19,12 +21,14 @@ const inicializePassport = () => {
             console.log("user register");
             return done(null, false);
           }
+          const cart = await cartDao.addCart();
           const newUser = {
             firstName,
             lastName,
             age,
             email,
             password: createHash(password),
+            cart: cart,
           };
           const mailOptions = {
             to: email,
@@ -74,6 +78,9 @@ const inicializePassport = () => {
             return done(null, false);
           }
           if (!validatePassword(password, user))
+          {
+            return done(null, false, { message: "Incorrect password." });  
+          }
           return done(null, user);
         } catch (err) {
           return done(err);

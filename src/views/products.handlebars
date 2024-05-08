@@ -14,7 +14,6 @@
             {{this.thumbnail}}
             <form action="/views/products/addToCart" method="post">
                 <label for="cid">Carrito ID</label>
-                <input type="text" id="cid" name="cid" required>
                 <input type="hidden" name="pid" value="{{this._id}}">
                 <button type="submit">agregar al carrito</button>
             </form>

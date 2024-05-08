@@ -1,5 +1,6 @@
 import cartModel from "../dao/fileSystem/mongodb/models/cart.model.js";
 import productModel from "../dao/fileSystem/mongodb/models/product.model.js";
+import { cartDao } from "../dao/index.js";
 
 class ViewsRouterController {
   static getProducts = async (req, res) => {
@@ -13,7 +14,6 @@ class ViewsRouterController {
       const cart = await cartModel
         .findById(cartId)
         .populate("products.product");
-      console.log(JSON.stringify(cart, null, "/t"));
 
       const { products } = cart;
 
@@ -52,15 +52,17 @@ class ViewsRouterController {
   };
 
   static addProductToCart = async (req, res) => {
-    const { cid, pid } = req.body;
+    const { pid } = req.body;
+    const userSession = req.session.user;
     try {
-      const cart = await cartModel.findById(cid);
+      console.log(req.session.user);
+      const cart = await cartDao.getCartById(userSession.cart);
+      console.log("console",cart);
       const product = await productModel.findById(pid);
       if (!cart) {
-        res.status(404).json({ message: "Cart not found" });
-      } else if (!product) {
-        res.status(404).json({ message: "Product not found" });
-      }
+        res.status(404).json({ message: "Cart or product not found" });
+        return;
+      } 
 
       const existingProduct = cart.products.find((p) => p.product == pid);
       if (existingProduct) {
