@@ -1,4 +1,5 @@
 import { PurchaseProductDTO } from "../DTOs/purchaseProduct.js";
+import { transporter } from "../config/gmail.js";
 import productModel from "../dao/fileSystem/mongodb/models/product.model.js";
 import { cartDao, productDao, ticketDao, userDao } from "../dao/index.js";
 import { ProductController } from "./product.controller.js";
@@ -141,20 +142,23 @@ class CartController {
           console.log("prod:", product);
 
           if (product.stock <= 0) {
-            // await CartController.deleteProdToCart(cartId, elem.product); 
+            // await CartController.deleteProdToCart(cartId, elem.product);
             await productDao.deleteProductById(product._id);
           } else {
-            productDao.updateProductById(product._id, product);
+            await productDao.updateProductById(product._id, product);
           }
- 
-          totalAmount += product.price * elem.quantity; 
-        } catch (err) { 
+
+          totalAmount += product.price * elem.quantity;
+        } catch (err) {
           throw new Error(err.message);
         }
       });
+
       console.log("cart", cart);
 
       const user = await userDao.getUserByCart(cart);
+
+      console.log("totalamount", totalAmount);
 
       console.log("user:", user);
 
@@ -162,7 +166,7 @@ class CartController {
         code: Math.floor(Math.random() * (1000000 - 1000 + 1)) + 1000,
         purchase_datetime: new Date(),
         amount: totalAmount,
-        purchase: req.session.user.email,
+        purchaser: req.session.user.email,
       };
 
       await ticketDao.createTicket(ticket);
@@ -173,6 +177,14 @@ class CartController {
       cart.total = 0;
 
       await cartDao.updateCart(cartId, cart);
+
+      const mailOptions = {
+        to: req.session.user.email,
+        subject: "Ticket de compra",
+        text: ticket,
+      };
+
+      transporter.sendMail(mailOptions, (err, res) => {});
 
       return res.json({ status: "success", message: ticket });
     } catch (error) {

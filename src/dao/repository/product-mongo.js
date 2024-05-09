@@ -75,7 +75,6 @@ class ProductMongo {
         { _id: productId },
         { $set: newProduct }
       );
-      console.log("resultado updbyId", result);
       return result;
     } catch (err) {
       throw new Error(err.message);

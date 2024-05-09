@@ -7,7 +7,9 @@ class TicketMongo {
 
   async createTicket(ticket) {
     try {
-      return await ticketModel.create(ticket);
+      const result = await ticketModel.create(ticket);
+      console.log("resultado de create ticket",result);
+      return result;
     } catch (e) {
       throw new Error(e.message);
     }

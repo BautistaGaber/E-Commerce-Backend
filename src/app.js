@@ -4,7 +4,7 @@ import __dirname from "./utils.js";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import passport from "passport";
-import 'dotenv/config';
+import "dotenv/config";
 import { engine } from "express-handlebars";
 import { Server } from "socket.io";
 import { productsRouter } from "./routes/products.js";
@@ -36,7 +36,7 @@ app.use(
     saveUninitialized: false,
   })
 );
-   
+
 inicializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
@@ -52,9 +52,7 @@ app.use("/users", userRouter);
 app.use("/mock", mockRouter);
 
 app.get("/", (req, res) => {
-  req.session.user = "Active Session";
-  console.log(req.session.user);
-  res.send("Session Set");
+  res.redirect("/views/users/login");
 });
 
 const httpServer = app.listen(PORT, () =>

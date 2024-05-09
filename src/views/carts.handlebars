@@ -21,8 +21,9 @@
             </li>
             {{/each}}
         </ul>
-        <form id="cartForm" action="/api/carts/purchase" method="post">
-            <button type="submit">Comprar</button>
-        </form>
+            <button id="checkout-btn" type="submit">Comprar</button>
     </div>
 </div>
+
+<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+<script type="module" src="/js/cart.js"></script>
